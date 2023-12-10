@@ -1,57 +1,126 @@
-use std::ops::{Add, Mul};
 use std::fmt;
+use std::ops::{Add, Deref, Mul};
+use std::rc::Rc;
+use std::cell::{Ref, RefCell};
 
-#[derive(PartialEq, Debug, Default)]
-pub struct Value<'a> {
+#[derive(Clone)]
+pub struct Value(Rc<RefCell<ValueInternal>>);
+
+impl Value {
+    pub fn from<T>(t: T) -> Self
+    where T: Into<Value>,
+    {
+        t.into()
+    }
+
+    fn new(t: ValueInternal) -> Self {
+        Self(Rc::new(RefCell::new(t)))
+    }
+
+    pub fn with_label(self, label: &str) -> Value {
+        self.0.borrow_mut().label = Some(label.to_string());
+        self
+    }
+
+    pub fn data(&self) -> f64 {
+        self.0.borrow().data
+    }
+}
+
+impl<T: Into<f64>> From<T> for Value {
+    fn from(t: T) -> Value {
+        Value::new(ValueInternal::new(t.into(), None, None, Vec::new(), None))
+    }
+}
+
+impl Add<Value> for Value {
+    type Output = Value;
+
+    fn add(self, other: Value) -> Self::Output {
+        add(&self, &other)
+    }
+}
+
+impl<'a, 'b> Add<&'b Value> for &'a Value {
+    type Output = Value;
+
+    fn add(self, other: &'b Value) -> Self::Output {
+        add(self, other)
+    }
+}
+
+fn add(a: &Value, b: &Value) -> Value {
+    let result = a.data() + b.data();
+
+    //let prop_fn: PropagateFn = |value| {
+    //    let mut first = value.previous
+    //};
+    Value::new(ValueInternal::new(
+        result,
+        None,
+        Some("+".to_string()),
+        vec![a.clone(), b.clone()],
+        None,
+    ))
+}
+
+impl Mul<Value> for Value {
+    type Output = Value;
+
+    fn mul(self, other: Value) -> Self::Output {
+        mul(&self, &other)
+    }
+}
+
+fn mul(a: &Value, b: &Value) -> Value {
+    let result = a.data() * b.data();
+
+    //let prop_fn: PropagateFn = |value| {
+    //    let mut first = value.previous
+    //};
+    Value::new(ValueInternal::new(
+        result,
+        None,
+        Some("*".to_string()),
+        vec![a.clone(), b.clone()],
+        None,
+    ))
+}
+
+// impl Deref for Value {
+//     type Target = Rc<RefCell<ValueInternal>>;
+//
+//     fn deref(&self) -> &Self::Target {
+//         &self.0
+//     }
+// }
+
+type PropagateFn = fn(value: &Ref<ValueInternal>);
+
+struct ValueInternal {
     data: f64,
-    grad: f64,
-    label: Option<&'a str>,
-    _prev: Option<Vec<Value<'a>>>,
-    _op: Option<&'a str>,
+    gradient: f64,
+    label: Option<String>,
+    operation: Option<String>,
+    previous: Vec<Value>,
+    propagate: Option<PropagateFn>,
 }
 
-impl<'a> Value<'a> {
-    pub fn new(data: f64, label: Option<&'a str>) -> Self {
-        Self {
+impl ValueInternal {
+    fn new(
+        data: f64,
+        label: Option<String>,
+        op: Option<String>,
+        prev: Vec<Value>,
+        propagate: Option<PropagateFn>,
+    ) -> Self {
+        ValueInternal {
             data,
+            gradient: 0.0,
             label,
-            ..Default::default()
+            operation: op,
+            previous: prev,
+            propagate,
         }
-    }
-
-    pub fn label(&mut self, label: &'a str) {
-        self.label = Some(label);
-    }
-}
-
-impl Add for Value<'_> {
-    type Output = Self;
-
-    fn add(self, other: Self) -> Self {
-        Self {
-            data: self.data + other.data,
-            _op: Some("+"),
-            _prev: Some(vec![self, other]),
-            ..Default::default()
-        }
-    }
-}
-
-impl Mul for Value<'_> {
-    type Output = Self;
-
-    fn mul(self, other: Self) -> Self {
-        Self {
-            data: self.data * other.data,
-            _op: Some("*"),
-            _prev: Some(vec![self, other]),
-            ..Default::default()
-        }
-    }
-}
-
-impl fmt::Display for Value<'_> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Value(data={})", self.data)
     }
 }
