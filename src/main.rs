@@ -3,38 +3,26 @@
 use gradrs::Value;
 
 fn main() -> anyhow::Result<()> {
-    let L = lol();
-
-    println!("{}", L);
+    lol();
 
     Ok(())
 }
 
-fn lol() -> f64 {
-    let h = 0.001;
+fn lol() {
+    // inputs
+    let x1 = Value::from(2.0).with_label("x1");
+    let x2 = Value::from(0.0).with_label("x2");
+    // weights
+    let w1 = Value::from(-3.0).with_label("w1");
+    let w2 = Value::from(1.0).with_label("w2");
+    // bias
+    let b = Value::from(6.8813735870195432).with_label("b");
+    let x1w1 = (x1 * w1).with_label("x1w1");
+    let x2w2 = (x2 * w2).with_label("x2w2");
+    let x1w1x2w2 = (x1w1 + x2w2).with_label("x1w1 + x2w2");
+    let n = (x1w1x2w2 + b).with_label("n");
+    let o = n.tanh().with_label("o");
 
-    let a = Value::from(2.0).with_label("a");
-    let b = Value::from(-3.0).with_label("b");
-    let c = Value::from(10.0).with_label("c");
-    let e = (a * b).with_label("e");
-
-    let d = (e + c).with_label("d");
-    let f = Value::from(-2.0).with_label("f");
-    let L1 = (d * f).with_label("L1");
-
-    let a = Value::from(2.0).with_label("a");
-    let b = Value::from(-3.0).with_label("b");
-    let c = Value::from(10.0 + h).with_label("c");
-    let e = (a * b).with_label("e");
-
-    let d = (e + c).with_label("d");
-    let f = Value::from(-2.0).with_label("f");
-    let L2 = (d * f).with_label("L1");
-
-    (L2.data() - L1.data()) / h
-}
-
-fn l2() {
-    let a = Value::from(2.0).with_label("a");
-    let d = &a + &a;
+    o.backward();
+    println!("{:?}", o);
 }
