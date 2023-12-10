@@ -29,12 +29,12 @@ fn lol() -> f64 {
 
     let d = (e + c).with_label("d");
     let f = Value::from(-2.0).with_label("f");
-    let L2 = (d * f).with_label("L2");
+    let L2 = (d * f).with_label("L1");
 
     (L2.data() - L1.data()) / h
 }
 
 fn l2() {
     let a = Value::from(2.0).with_label("a");
-    let d = a + a;
+    let d = &a + &a;
 }

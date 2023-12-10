@@ -52,15 +52,20 @@ impl<'a, 'b> Add<&'b Value> for &'a Value {
 fn add(a: &Value, b: &Value) -> Value {
     let result = a.data() + b.data();
 
-    //let prop_fn: PropagateFn = |value| {
-    //    let mut first = value.previous
-    //};
+    let prop_fn: PropagateFn = |value| {
+        let mut first = value.previous[0].0.borrow_mut();
+        let mut second = value.previous[1].0.borrow_mut();
+
+        first.gradient += value.gradient;
+        second.gradient += value.gradient;
+    };
+
     Value::new(ValueInternal::new(
         result,
         None,
         Some("+".to_string()),
         vec![a.clone(), b.clone()],
-        None,
+        Some(prop_fn),
     ))
 }
 
