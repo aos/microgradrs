@@ -1,9 +1,11 @@
 #![allow(non_snake_case)]
 
-use gradrs::Value;
+use gradrs::layer::Layer;
+use gradrs::neuron::Neuron;
+use gradrs::value::Value;
 
 fn main() -> anyhow::Result<()> {
-    lol();
+    c3();
 
     Ok(())
 }
@@ -21,8 +23,25 @@ fn lol() {
     let x2w2 = (x2 * w2).with_label("x2w2");
     let x1w1x2w2 = (x1w1 + x2w2).with_label("x1w1 + x2w2");
     let n = (x1w1x2w2 + b).with_label("n");
-    let o = n.tanh().with_label("o");
+    let mut o = n.tanh().with_label("o");
 
     o.backward();
     println!("{:?}", o);
+}
+
+fn lol2() {
+    let a = Value::from(2.0).with_label("a");
+    let b = Value::from(4.0).with_label("b");
+    let mut c = a / b;
+
+    c.backward();
+    println!("{:?}", c);
+}
+
+fn c3() {
+    let z = Layer::new(2, 3);
+    let x = z.call(vec![2.0, 3.0]);
+    for i in x {
+        println!("{}", i);
+    }
 }
