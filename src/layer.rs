@@ -1,22 +1,19 @@
 use crate::neuron::Neuron;
 use crate::value::Value;
 
+#[derive(Clone)]
 pub struct Layer {
     neurons: Vec<Neuron>,
 }
 
 impl Layer {
     pub fn new(nin: usize, nout: usize) -> Self {
-        let mut z: Vec<Neuron> = Vec::new();
-
-        for _ in 0..nout {
-            z.push(Neuron::new(nin));
+        Layer {
+            neurons: (0..nout).map(|_| Neuron::new(nin)).collect(),
         }
-
-        Layer { neurons: z }
     }
 
-    pub fn call(&self, x: Vec<f64>) -> Vec<Value> {
+    pub fn call(&self, x: Vec<Value>) -> Vec<Value> {
         self.neurons
             .iter()
             .map(|n| n.call(x.clone()))

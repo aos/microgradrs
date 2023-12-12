@@ -1,11 +1,11 @@
 #![allow(non_snake_case)]
 
 use gradrs::layer::Layer;
-use gradrs::neuron::Neuron;
+use gradrs::mlp::MLP;
 use gradrs::value::Value;
 
 fn main() -> anyhow::Result<()> {
-    c3();
+    c4();
 
     Ok(())
 }
@@ -40,8 +40,18 @@ fn lol2() {
 
 fn c3() {
     let z = Layer::new(2, 3);
-    let x = z.call(vec![2.0, 3.0]);
+    let x = z.call(vec![2.0.into(), 3.0.into()]);
     for i in x {
+        println!("{}", i);
+    }
+}
+
+fn c4() {
+    let x = vec![2.0, 3.0, -1.0];
+    let z = MLP::new(3, vec![4, 4, 1]);
+    let n = z.call(x.iter().map(|n| Value::from(*n)).collect::<Vec<_>>());
+
+    for i in n {
         println!("{}", i);
     }
 }
