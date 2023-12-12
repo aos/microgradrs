@@ -1,12 +1,10 @@
 #![allow(non_snake_case)]
 
-use gradrs::layer::Layer;
-use gradrs::mlp::MLP;
-use gradrs::value::Value;
+use gradrs::Layer;
+use gradrs::Value;
+use gradrs::MLP;
 
 fn main() -> anyhow::Result<()> {
-    c4();
-
     Ok(())
 }
 
