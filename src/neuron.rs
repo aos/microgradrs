@@ -27,4 +27,10 @@ impl Neuron {
             + self.bias.clone())
         .tanh()
     }
+
+    pub fn parameters(&self) -> Vec<Value> {
+        let mut z = self.weights.clone();
+        z.push(self.bias.clone());
+        z
+    }
 }

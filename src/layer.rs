@@ -23,4 +23,8 @@ impl Layer {
     pub fn neurons(&self) -> &Vec<Neuron> {
         &self.neurons
     }
+
+    pub fn parameters(&self) -> Vec<Value> {
+        self.neurons.iter().flat_map(|n| n.parameters()).collect()
+    }
 }

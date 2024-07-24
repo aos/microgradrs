@@ -5,10 +5,15 @@ use gradrs::Value;
 use gradrs::MLP;
 
 fn main() -> anyhow::Result<()> {
+    one();
+    two();
+    c3();
+    c4();
+
     Ok(())
 }
 
-fn lol() {
+fn one() {
     // inputs
     let x1 = Value::from(2.0).with_label("x1");
     let x2 = Value::from(0.0).with_label("x2");
@@ -27,7 +32,7 @@ fn lol() {
     println!("{:?}", o);
 }
 
-fn lol2() {
+fn two() {
     let a = Value::from(2.0).with_label("a");
     let b = Value::from(4.0).with_label("b");
     let mut c = a / b;

@@ -26,4 +26,8 @@ impl MLP {
         }
         z
     }
+
+    pub fn parameters(&self) -> Vec<Value> {
+        self.layers.iter().flat_map(|n| n.parameters()).collect()
+    }
 }
